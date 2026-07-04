@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>বাংলা ফন্ট কনভার্টার | SolaimanLipi ⇄ SutonnyMJ</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mirazmac/bengali-webfont-cdn@master/solaimanlipi/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --bg:#efe9d8; --panel:#f7f3e7; --ink:#2c2a24; --muted:#7a7462;
+    --accent:#5c5232; --accent-2:#8a7b4a; --line:#d9d0b6; --danger:#b3492f; --ok:#3f6b4a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Noto Sans Bengali','Segoe UI',sans-serif; padding:28px 16px 60px;}
+  .wrap{max-width:1080px; margin:0 auto;}
+  header{text-align:center; margin-bottom:20px;}
+  header h1{font-family:'Noto Serif Bengali',serif; font-size:1.7rem; margin:0 0 4px; color:var(--accent);}
+  header p{margin:0; color:var(--muted); font-size:.92rem;}
+
+  .tabs{display:flex; gap:8px; margin-bottom:16px; justify-content:center;}
+  .tab-btn{flex:0 1 320px; padding:12px 14px; border:1px solid var(--line); background:var(--panel); border-radius:10px 10px 0 0; cursor:pointer; font-size:.95rem; color:var(--muted); text-align:center; transition:.15s;}
+  .tab-btn.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:0 10px 10px 10px; padding:20px; margin-bottom:18px;}
+
+  .direction-bar{display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:18px;}
+  .font-pill{padding:10px 18px; border-radius:999px; background:#e7e0c8; border:1px solid var(--line); text-align:center; min-width:170px;}
+  .font-pill b{display:block; font-size:.95rem; color:var(--ink);}
+  .font-pill span{font-size:.75rem; color:var(--muted);}
+  .swap-btn{width:42px; height:42px; border-radius:50%; border:1px solid var(--accent); background:#fff; color:var(--accent); font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s;}
+  .swap-btn:hover{background:var(--accent); color:#fff;}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:760px){.grid{grid-template-columns:1fr;}}
+
+  .col label{display:flex; justify-content:space-between; align-items:center; font-size:.85rem; color:var(--muted); margin-bottom:6px;}
+  .col label .copy-btn{border:none; background:none; color:var(--accent); cursor:pointer; font-size:.8rem; text-decoration:underline;}
+  textarea{width:100%; min-height:220px; padding:14px; border:1px solid var(--line); border-radius:8px; font-size:1.15rem; line-height:1.9; resize:vertical; background:#fff; color:var(--ink);}
+  textarea[readonly]{background:#faf8f0;}
+
+  .dropzone{border:2px dashed var(--line); border-radius:10px; padding:40px 20px; text-align:center; background:#fbf9f1; cursor:pointer; color:var(--muted);}
+  .dropzone.drag{border-color:var(--accent); background:#f0ead2;}
+  .dropzone input{display:none;}
+  .file-name{margin-top:10px; font-size:.85rem; color:var(--ok);}
+
+  .actions{display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap;}
+  button.primary{background:var(--accent); color:#fff; border:none; padding:12px 28px; border-radius:8px; font-size:1rem; cursor:pointer;}
+  button.primary:hover{background:#453e25;}
+  button.primary:disabled{opacity:.6; cursor:not-allowed;}
+  button.secondary{background:#fff; color:var(--ink); border:1px solid var(--line); padding:12px 22px; border-radius:8px; cursor:pointer;}
+  button.secondary:hover{border-color:var(--accent);}
+
+  .preview-toggle{text-align:center; margin-top:6px;}
+  .preview-toggle button{background:none; border:none; color:var(--accent-2); cursor:pointer; font-size:.85rem; text-decoration:underline;}
+  .preview{margin-top:14px; display:none;}
+  .preview.show{display:block;}
+  .preview-box{border:1px solid var(--line); border-radius:8px; padding:16px; background:#fff; font-size:1.3rem; line-height:2; min-height:80px; white-space:pre-wrap; word-break:break-word;}
+  .preview-box.src{font-family:'SolaimanLipi', serif;}
+  .preview-note{font-size:.78rem; color:var(--muted); margin-top:6px;}
+  .badge{display:inline-block; font-size:.72rem; padding:2px 8px; border-radius:999px; background:#e7e0c8; color:var(--accent); margin-left:6px;}
+
+  /* docx preview */
+  #docxPreviewWrap{margin-top:22px; display:none;}
+  .preview-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;}
+  .preview-toolbar h3{margin:0; font-size:1rem; color:var(--accent); font-family:'Noto Serif Bengali',serif;}
+  .docx-page{background:#fff; border:1px solid var(--line); border-radius:8px; padding:28px 30px; min-height:200px; max-height:640px; overflow:auto; font-size:1.15rem; line-height:1.9;}
+  .docx-page p{margin:0 0 8px;}
+  .docx-page table.doc-table{border-collapse:collapse; width:100%; margin-bottom:10px;}
+  .docx-page table.doc-table td{border:1px solid #ccc; padding:6px 8px; vertical-align:top;}
+  .docx-page .eq{display:inline-block; background:#f0ead2; border:1px solid var(--line); border-radius:4px; padding:0 6px; font-family:'Cambria Math','Times New Roman',serif; font-style:italic; margin:0 2px;}
+  .docx-page .rn{outline:none;}
+  .docx-page .rn:focus{background:#fff6d6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>বাংলা ফন্ট কনভার্টার</h1>
+    <p>SolaimanLipi (ইউনিকোড) ⇄ SutonnyMJ (বিজয় ANSI) — নিখুঁতভাবে দুই দিকেই কনভার্ট</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab-btn active" data-tab="paste">✎ লেখা পেস্ট করে কনভার্ট</div>
+    <div class="tab-btn" data-tab="upload">⭱ Word (.docx) আপলোড করে কনভার্ট</div>
+  </div>
+
+  <div class="card">
+    <div class="direction-bar">
+      <div class="font-pill"><b id="pillLeft">SolaimanLipi</b><span id="pillLeftSub">Unicode</span></div>
+      <button class="swap-btn" id="swapBtn" title="দিক পরিবর্তন করুন">⇄</button>
+      <div class="font-pill"><b id="pillRight">SutonnyMJ</b><span id="pillRightSub">Bijoy ANSI</span></div>
+    </div>
+
+    <div id="pasteTab">
+      <div class="grid">
+        <div class="col">
+          <label><span id="srcLabel">উৎস লেখা (ইউনিকোড)</span></label>
+          <textarea id="srcText" placeholder="এখানে লেখা পেস্ট করুন..."></textarea>
+        </div>
+        <div class="col">
+          <label><span id="resLabel">ফলাফল (বিজয়)</span> <button class="copy-btn" id="copyBtn">কপি করুন</button></label>
+          <textarea id="resText" readonly placeholder="কনভার্ট করা লেখা এখানে দেখাবে..."></textarea>
+        </div>
+      </div>
+      <div class="preview-toggle">
+        <button id="previewToggleBtn">প্রিভিউ দেখুন / লুকান</button>
+      </div>
+      <div class="preview" id="previewArea">
+        <div class="grid">
+          <div class="col">
+            <label>উৎস প্রিভিউ</label>
+            <div class="preview-box src" id="previewSrc"></div>
+          </div>
+          <div class="col">
+            <label>ফলাফল প্রিভিউ <span class="badge" id="resFontBadge">SutonnyMJ</span></label>
+            <div class="preview-box res" id="previewRes" style="font-family:'SutonnyMJ','Noto Sans Bengali',sans-serif;"></div>
+            <div class="preview-note" id="fontNote"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="uploadTab" style="display:none;">
+      <div class="dropzone" id="dropzone">
+        <div>📄 Word (.docx) ফাইল এখানে ড্র্যাগ করুন অথবা ক্লিক করে বেছে নিন</div>
+        <div class="file-name" id="fileNameShow"></div>
+        <input type="file" id="fileInput" accept=".docx">
+      </div>
+      <div class="preview-note" style="text-align:center; margin-top:10px;">
+        শুধু বাংলা লেখা কনভার্ট হবে — ইংরেজি লেখা, সংখ্যা, সমীকরণ (Equation) এবং ছবি অপরিবর্তিত থাকবে।
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="convertBtn">কনভার্ট করুন</button>
+      <button class="secondary" id="clearBtn">মুছে ফেলুন</button>
+    </div>
+
+    <div id="docxPreviewWrap">
+      <div class="preview-toolbar">
+        <h3>রূপান্তরিত ফাইলের প্রিভিউ</h3>
+        <button class="primary" id="downloadDocxBtn">Word ফাইল ডাউনলোড করুন</button>
+      </div>
+      <div class="preview-note" id="docxPreviewNote"></div>
+      <div class="docx-page" id="docxPreview" contenteditable="true" spellcheck="false"></div>
+      <div class="preview-note" style="margin-top:6px;">প্রিভিউ-তে সরাসরি লেখা এডিট করা যায় (সমীকরণ ও ছবি ব্যতীত)। এডিট শেষে উপরের Download বাটনে ক্লিক করুন — পরিবর্তনগুলো ডাউনলোড হওয়া ফাইলে যুক্ত থাকবে।</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========================================================================
+   Core Bijoy(SutonnyMJ ANSI) <-> Unicode(SolaimanLipi) conversion engine
+   ======================================================================== */
+const BIJOY_MAP = {
+  'Av':'আ','A':'অ','B':'ই','C':'ঈ','D':'উ','E':'ঊ','F':'ঋ','G':'এ','H':'ঐ','I':'ও','J':'ঔ',
+  'K':'ক','L':'খ','M':'গ','N':'ঘ','O':'ঙ','P':'চ','Q':'ছ','R':'জ','S':'ঝ','T':'ঞ','U':'ট','V':'ঠ',
+  'W':'ড','X':'ঢ','Y':'ণ','Z':'ত','_':'থ','`':'দ','a':'ধ','b':'ন','c':'প','d':'ফ','e':'ব','f':'ভ',
+  'g':'ম','h':'য','i':'র','j':'ল','k':'শ','l':'ষ','m':'স','n':'হ','o':'ড়','p':'ঢ়','q':'য়','r':'ৎ',
+  's':'ং','t':'ঃ','u':'ঁ',
+  '0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯',
+  '•':'ঙ্','v':'া','w':'ি','x':'ী','y':'ু','z':'ু','“':'ু','–':'ু','~':'ূ','ƒ':'ূ','‚':'ূ',
+  '„„':'ৃ','„':'ৃ','…':'ৃ','†':'ে','‡':'ে','ˆ':'ৈ','‰':'ৈ','Š':'ৗ','|':'।','&':'্‌',
+  '^':'্ব','‘':'্তু','’':'্থ','‹':'্ক','Œ':'্ক্র','”':'চ্','—':'্ত','˜':'দ্','™':'দ্','š':'ন্','›':'ন্',
+  'œ':'্ন','Ÿ':'্ব','¡':'্ব','¢':'্ভ','£':'্ভ্র','¤':'ম্','¥':'্ম','¦':'্ব','§':'্ম','¨':'্য','©':'র্',
+  'ª':'্র','«':'্র','¬':'্ল','­':'্ল','®':'ষ্','¯':'স্','°':'ক্ক','±':'ক্ট','²':'ক্ষ্ণ','³':'ক্ত','´':'ক্ম',
+  'µ':'ক্র','¶':'ক্ষ','·':'ক্স','¸':'গু','¹':'জ্ঞ','º':'গ্দ','»':'গ্ধ','¼':'ঙ্ক','½':'ঙ্গ','¾':'জ্জ',
+  '¿':'্ত্র','À':'জ্ঝ','Á':'জ্ঞ','Â':'ঞ্চ','Ã':'ঞ্ছ','Ä':'ঞ্জ','Å':'ঞ্ঝ','Æ':'ট্ট','Ç':'ড্ড','È':'ণ্ট',
+  'É':'ণ্ঠ','Ê':'ণ্ড','Ë':'ত্ত','Ì':'ত্থ','Í':'ত্ম','Î':'ত্র','Ï':'দ্দ','Ð':'-','Ñ':'-','Ò':'"','Ó':'"',
+  'Ô':"'",'Õ':"'",'Ö':'্র','×':'দ্ধ','Ø':'দ্ব','Ù':'দ্ম','Ú':'ন্ঠ','Û':'ন্ড','Ü':'ন্ধ','Ý':'ন্স','Þ':'প্ট',
+  'ß':'প্ত','à':'প্প','á':'প্স','â':'ব্জ','ã':'ব্দ','ä':'ব্ধ','å':'ভ্র','æ':'ম্ন','ç':'ম্ফ','è':'্ন',
+  'é':'ল্ক','ê':'ল্গ','ë':'ল্ট','ì':'ল্ড','í':'ল্প','î':'ল্ফ','ï':'শু','ð':'শ্চ','ñ':'শ্ছ','ò':'ষ্ণ',
+  'ó':'ষ্ট','ô':'ষ্ঠ','õ':'ষ্ফ','ö':'স্খ','÷':'স্ট','ø':'স্ন','ù':'স্ফ','ú':'্প','û':'হু','ü':'হৃ',
+  'ý':'হ্ন','þ':'হ্ম'
+};
+const BIJOY_KEYS = Object.keys(BIJOY_MAP).sort((a,b)=>b.length-a.length);
+const UNICODE_MAP = {};
+for (const k of Object.keys(BIJOY_MAP)) { const v = BIJOY_MAP[k]; if (!(v in UNICODE_MAP)) UNICODE_MAP[v] = k; }
+const UNICODE_KEYS = Object.keys(UNICODE_MAP).sort((a,b)=>b.length-a.length);
+
+function mapChars(str, map, keysDesc, fallback) {
+  let result = ''; let i = 0;
+  while (i < str.length) {
+    let matched = false;
+    for (const k of keysDesc) {
+      if (k.length && str.startsWith(k, i)) { result += map[k]; i += k.length; matched = true; break; }
+    }
+    if (!matched) { result += fallback ? fallback(str, i) : str[i]; i++; }
+  }
+  return result;
+}
+
+const PRE_KAR = ['ি','ৈ','ে'];
+const POST_KAR = ['া','ো','ৌ','ৗ','ু','ূ','ী','ৃ'];
+const BANJON = 'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহড়ঢ়য়ৎংঃঁ'.split('');
+function isPreKar(c){return PRE_KAR.includes(c);}
+function isPostKar(c){return POST_KAR.includes(c);}
+function isKar(c){return isPreKar(c)||isPostKar(c);}
+function isBanjon(c){return BANJON.includes(c);}
+function isNukta(c){return c==='ঁ';}
+function isHalant(c){return c==='্';}
+function isSpaceC(c){return c===undefined||c===' '||c==='\t'||c==='\n'||c==='\r';}
+const BN_RE = /[\u0980-\u09FF]/;
+function hasBangla(s){return BN_RE.test(s);}
+
+function reArrange(str){
+  let a = Array.from(str);
+  for (let i=0;i<a.length;i++){
+    if (i<a.length-1 && a[i]==='র' && isHalant(a[i+1]) && !isHalant(a[i-1])) {
+      let j=1;
+      while(true){ if (i-j<0) break;
+        if (isBanjon(a[i-j]) && isHalant(a[i-j-1])) j+=2;
+        else if (j===1 && isKar(a[i-j])) j++;
+        else break; }
+      const before=a.slice(0,i-j), moved=a.slice(i-j,i), after=a.slice(i+2);
+      a = before.concat([a[i],a[i+1]], moved, after); i+=1;
+    }
+  }
+  a = Array.from(a.join('').split('্্').join('্'));
+  for (let i=0;i<a.length;i++){
+    if (i<a.length-1 && a[i]==='র' && isHalant(a[i+1]) && !isHalant(a[i-1]) && isHalant(a[i+2])) {
+      let j=1;
+      while(true){ if (i-j<0) break;
+        if (isBanjon(a[i-j]) && isHalant(a[i-j-1])) j+=2;
+        else if (j===1 && isKar(a[i-j])) j++;
+        else break; }
+      const before=a.slice(0,i-j), moved=a.slice(i-j,i), after=a.slice(i+2);
+      a = before.concat([a[i],a[i+1]], moved, after); i+=1; continue;
+    }
+    if (i>0 && a[i]==='্' && (isKar(a[i-1])||isNukta(a[i-1])) && i<a.length-1) {
+      const before=a.slice(0,i-1), after=a.slice(i+2);
+      a = before.concat([a[i],a[i+1],a[i-1]], after);
+    }
+    if (i>0 && i<a.length-1 && a[i]==='্' && a[i-1]==='র' && a[i-2]!=='্' && isKar(a[i+1])) {
+      const before=a.slice(0,i-1), after=a.slice(i+2);
+      a = before.concat([a[i+1],a[i-1],a[i]], after);
+    }
+    if (i<a.length-1 && isPreKar(a[i]) && !isSpaceC(a[i+1])) {
+      let j=1;
+      while ((i+j)<a.length-1 && isBanjon(a[i+j])) { if ((i+j)<a.length && isHalant(a[i+j+1])) j+=2; else break; }
+      const before=a.slice(0,i), cluster=a.slice(i+1,i+j+1);
+      let l=0, karOut;
+      if (a[i]==='ে' && a[i+j+1]==='া') { karOut='ো'; l=1; }
+      else if (a[i]==='ে' && a[i+j+1]==='ৗ') { karOut='ৌ'; l=1; }
+      else karOut=a[i];
+      const after=a.slice(i+j+l+1);
+      a = before.concat(cluster,[karOut],after); i+=j;
+    }
+    if (i<a.length-1 && isNukta(a[i]) && isPostKar(a[i+1])) {
+      const before=a.slice(0,i), after=a.slice(i+2);
+      a = before.concat([a[i+1],a[i]], after);
+    }
+  }
+  return a.join('');
+}
+
+function bijoyToUnicode(text){
+  let s = text;
+  s = s.replace(/ +/g,' ');
+  s = s.split('yy').join('y');
+  s = s.split('vv').join('v');
+  s = mapChars(s, BIJOY_MAP, BIJOY_KEYS);
+  s = reArrange(s);
+  const bnDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+  for (const d of bnDigits) s = s.split(d+'ঃ').join(d+':');
+  s = s.split(' ঃ').join(' :');
+  s = s.split('অা').join('আ');
+  s = s.split('্‌্‌').join('্‌');
+  return s;
+}
+
+function moveReph(str){
+  let a = Array.from(str); let out = []; let i = 0;
+  while (i < a.length) {
+    if (a[i]==='র' && a[i+1]==='্' && isBanjon(a[i+2])) {
+      let j = i+2;
+      while (j+2 < a.length && a[j+1]==='্' && isBanjon(a[j+2]) && a[j]!=='র') j += 2;
+      let end = j+1; if (end<a.length && isKar(a[end])) end++;
+      const cluster = a.slice(i+2, end);
+      out.push(...cluster, a[i], a[i+1]); i = end;
+    } else { out.push(a[i]); i++; }
+  }
+  return out.join('');
+}
+function movePreKar(str){
+  let a = Array.from(str); let out = []; let i = 0;
+  while (i < a.length) {
+    if (isBanjon(a[i]) && !isHalant(a[i])) {
+      let j = i+1;
+      while (j+1<a.length && a[j]==='্' && isBanjon(a[j+1])) j+=2;
+      if (j<a.length && isPreKar(a[j])) { out.push(a[j]); for (let k=i;k<j;k++) out.push(a[k]); i = j+1; }
+      else { for (let k=i;k<j;k++) out.push(a[k]); i = j; }
+    } else { out.push(a[i]); i++; }
+  }
+  return out.join('');
+}
+function unicodeToBijoy(text){
+  let s = text;
+  s = s.split('ো').join('ে'+'া');
+  s = s.split('ৌ').join('ে'+'ৗ');
+  s = moveReph(s);
+  s = movePreKar(s);
+  s = mapChars(s, UNICODE_MAP, UNICODE_KEYS, (str,i)=> str[i]==='্' ? '&' : str[i]);
+  return s;
+}
+
+/* ========================================================================
+   DOCX (.docx) pipeline — converts ONLY Bangla text inside <w:t>,
+   leaves English text, numbers, equations (<m:oMath>) and images untouched.
+   ======================================================================== */
+function directChild(el, tag){ for (const c of el.children||[]) if (c.tagName===tag) return c; return null; }
+function getFontNames(runEl){
+  const rPr = directChild(runEl,'w:rPr'); if (!rPr) return null;
+  const rFonts = directChild(rPr,'w:rFonts'); if (!rFonts) return null;
+  return {
+    ascii:(rFonts.getAttribute('w:ascii')||'').toLowerCase(),
+    hAnsi:(rFonts.getAttribute('w:hAnsi')||'').toLowerCase(),
+    cs:(rFonts.getAttribute('w:cs')||'').toLowerCase(),
+  };
+}
+function isSutonnyFont(f){ return !!f && (f.ascii.includes('sutonny')||f.hAnsi.includes('sutonny')||f.cs.includes('sutonny')); }
+function ensureRFonts(doc, runEl){
+  let rPr = directChild(runEl,'w:rPr');
+  if(!rPr){ rPr = doc.createElement('w:rPr'); runEl.insertBefore(rPr, runEl.firstChild); }
+  let rFonts = directChild(rPr,'w:rFonts');
+  if(!rFonts){ rFonts = doc.createElement('w:rFonts'); rPr.insertBefore(rFonts, rPr.firstChild); }
+  return rFonts;
+}
+function setFont(doc, runEl, fontName){
+  const rFonts = ensureRFonts(doc, runEl);
+  rFonts.setAttribute('w:ascii', fontName);
+  rFonts.setAttribute('w:hAnsi', fontName);
+  rFonts.setAttribute('w:cs', fontName);
+}
+
+function processRunB2U(doc, runEl){
+  const f = getFontNames(runEl);
+  if (!isSutonnyFont(f)) return;
+  const wts = Array.from(runEl.children).filter(c=>c.tagName==='w:t');
+  if (!wts.length) return;
+  let changed=false;
+  for (const wt of wts){ const txt = wt.textContent; if (!txt) continue; wt.textContent = bijoyToUnicode(txt); changed=true; }
+  if (changed) setFont(doc, runEl, 'SolaimanLipi');
+}
+
+function processRunU2B(doc, runEl){
+  const wts = Array.from(runEl.children).filter(c=>c.tagName==='w:t');
+  if (wts.length !== 1) {
+    // fallback for rare multi w:t runs: convert bangla segments in place
+    for (const wt of wts){
+      const txt = wt.textContent||'';
+      if (!hasBangla(txt)) continue;
+      const segs = txt.match(/[\u0980-\u09FF]+|[^\u0980-\u09FF]+/g) || [txt];
+      wt.textContent = segs.map(s=>hasBangla(s)?unicodeToBijoy(s):s).join('');
+      setFont(doc, runEl, 'SutonnyMJ');
+    }
+    return;
+  }
+  const wt = wts[0];
+  const text = wt.textContent || '';
+  if (!hasBangla(text)) return;
+  const segments = text.match(/[\u0980-\u09FF]+|[^\u0980-\u09FF]+/g) || [text];
+  if (segments.length===1) { wt.textContent = unicodeToBijoy(text); setFont(doc, runEl, 'SutonnyMJ'); return; }
+  const parent = runEl.parentNode;
+  const originalRPr = directChild(runEl,'w:rPr');
+  const fragRuns = [];
+  for (const seg of segments){
+    const newRun = doc.createElement('w:r');
+    if (originalRPr) newRun.appendChild(originalRPr.cloneNode(true));
+    const newWt = doc.createElement('w:t');
+    newWt.setAttribute('xml:space','preserve');
+    if (hasBangla(seg)) { newWt.textContent = unicodeToBijoy(seg); setFont(doc, newRun, 'SutonnyMJ'); }
+    else { newWt.textContent = seg; }
+    newRun.appendChild(newWt);
+    fragRuns.push(newRun);
+  }
+  for (const nr of fragRuns) parent.insertBefore(nr, runEl);
+  parent.removeChild(runEl);
+}
+
+function processPart(xmlDoc, direction){
+  const runs = Array.from(xmlDoc.getElementsByTagName('w:r'));
+  for (const r of runs){ direction==='u2b' ? processRunU2B(xmlDoc, r) : processRunB2U(xmlDoc, r); }
+}
+
+function serializeXml(xmlDoc){
+  let s = new XMLSerializer().serializeToString(xmlDoc);
+  s = s.replace(/^<\?xml[^>]*\?>\s*/,'');
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' + s;
+}
+
+async function resolveImages(zip, relsPath, baseDir){
+  const map = {};
+  const relsFile = zip.file(relsPath);
+  if (!relsFile) return map;
+  const txt = await relsFile.async('string');
+  const xdoc = new DOMParser().parseFromString(txt,'application/xml');
+  const rels = Array.from(xdoc.getElementsByTagName('Relationship'));
+  for (const rel of rels){
+    const type = rel.getAttribute('Type')||'';
+    if (!/image/i.test(type)) continue;
+    const id = rel.getAttribute('Id');
+    let target = (rel.getAttribute('Target')||'').replace(/^\//,'');
+    let path = (baseDir+target).replace('word/../','');
+    const f = zip.file(path);
+    if (!f) continue;
+    const ext = (path.split('.').pop()||'').toLowerCase();
+    if (!['png','jpg','jpeg','gif','bmp'].includes(ext)) continue;
+    const b64 = await f.async('base64');
+    const mime = ext==='jpg' ? 'jpeg' : ext;
+    map[id] = `data:image/${mime};base64,${b64}`;
+  }
+  return map;
+}
+
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+let previewRefs = [];
+function fontCss(runEl){
+  const f = getFontNames(runEl);
+  const name = f ? (f.ascii || f.hAnsi || f.cs) : '';
+  return name ? `'${name}', 'Noto Sans Bengali', sans-serif` : 'inherit';
+}
+function renderRun(runEl, imgMap){
+  let html='';
+  for (const child of runEl.children){
+    if (child.tagName==='w:t'){
+      previewRefs.push(child);
+      html += `<span class="rn" data-ref="${previewRefs.length-1}" style="font-family:${fontCss(runEl)}">${escapeHtml(child.textContent)}</span>`;
+    } else if (child.tagName==='w:tab'){ html += '&emsp;'; }
+    else if (child.tagName==='w:br'){ html += '<br>'; }
+    else if (child.tagName==='w:drawing'){
+      const blip = child.getElementsByTagName('a:blip')[0];
+      const rid = blip ? blip.getAttribute('r:embed') : null;
+      const src = rid && imgMap[rid] ? imgMap[rid] : null;
+      if (src) html += `<br><img src="${src}" contenteditable="false" style="max-width:100%;">`;
+    }
+  }
+  return html;
+}
+function renderMath(mathEl){
+  const ts = Array.from(mathEl.getElementsByTagName('m:t')).map(t=>t.textContent).join('');
+  return `<span class="eq" contenteditable="false" title="সমীকরণ - এডিট করা যাবে না">${escapeHtml(ts)}</span>`;
+}
+function renderParagraph(pEl, imgMap){
+  let html=''; let hasContent=false;
+  for (const child of pEl.children){
+    if (child.tagName==='w:r'){ html+=renderRun(child, imgMap); hasContent=true; }
+    else if (child.tagName==='m:oMath' || child.tagName==='m:oMathPara'){ html+=renderMath(child); hasContent=true; }
+  }
+  return `<p>${hasContent?html:'&nbsp;'}</p>`;
+}
+function renderTable(tblEl, imgMap){
+  let html='<table class="doc-table"><tbody>';
+  for (const tr of tblEl.children){
+    if (tr.tagName!=='w:tr') continue;
+    html+='<tr>';
+    for (const tc of tr.children){
+      if (tc.tagName!=='w:tc') continue;
+      html+='<td>';
+      for (const c of tc.children){ if (c.tagName==='w:p') html+=renderParagraph(c, imgMap); else if (c.tagName==='w:tbl') html+=renderTable(c, imgMap); }
+      html+='</td>';
+    }
+    html+='</tr>';
+  }
+  return html+'</tbody></table>';
+}
+function renderBody(xmlDoc, imgMap){
+  previewRefs = [];
+  const body = xmlDoc.getElementsByTagName('w:body')[0];
+  let html='';
+  for (const child of body.children){
+    if (child.tagName==='w:p') html+=renderParagraph(child, imgMap);
+    else if (child.tagName==='w:tbl') html+=renderTable(child, imgMap);
+  }
+  return html;
+}
+
+let currentZip=null, currentDocXml=null, currentMainPath='word/document.xml', currentOutFileName='converted.docx';
+
+async function convertDocxFile(){
+  if (!window._uploadedFile){ alert('আগে একটি Word (.docx) ফাইল আপলোড করুন।'); return; }
+  const btn = document.getElementById('convertBtn');
+  const original = btn.textContent; btn.textContent='কনভার্ট হচ্ছে...'; btn.disabled=true;
+  try{
+    const buf = await window._uploadedFile.arrayBuffer();
+    const zip = await JSZip.loadAsync(buf);
+    const partNames = Object.keys(zip.files).filter(n=>/^word\/(document|header\d*|footer\d*|footnotes|endnotes)\.xml$/i.test(n));
+    const parser = new DOMParser();
+    let docXml = null;
+    for (const name of partNames){
+      const txt = await zip.file(name).async('string');
+      const xdoc = parser.parseFromString(txt, 'application/xml');
+      processPart(xdoc, direction);
+      zip.file(name, serializeXml(xdoc));
+      if (name === 'word/document.xml') docXml = xdoc;
+    }
+    const imgMap = await resolveImages(zip, 'word/_rels/document.xml.rels', 'word/');
+    const html = renderBody(docXml, imgMap);
+    document.getElementById('docxPreview').innerHTML = html;
+    document.getElementById('docxPreviewWrap').style.display='block';
+    document.getElementById('docxPreviewNote').textContent = direction==='u2b'
+      ? 'রূপান্তরিত বাংলা অংশ SutonnyMJ ফন্টে সঠিকভাবে দেখতে হলে আপনার কম্পিউটারে SutonnyMJ ফন্ট ইনস্টল থাকতে হবে (কপিরাইটের কারণে ব্রাউজারে অটো-লোড করা যায় না)। ফন্ট না থাকলে এখানে ইংরেজি অক্ষরের মতো দেখাবে, কিন্তু ডাউনলোড হওয়া ফাইলটি সঠিক থাকবে।'
+      : 'রূপান্তরিত লেখা এখন ইউনিকোড, তাই সঠিকভাবে বাংলায় দেখা যাচ্ছে।';
+    currentZip = zip; currentDocXml = docXml; currentMainPath='word/document.xml';
+    const base = window._uploadedFile.name.replace(/\.docx$/i,'');
+    currentOutFileName = base + (direction==='u2b' ? '-SutonnyMJ.docx' : '-SolaimanLipi.docx');
+    document.getElementById('docxPreviewWrap').scrollIntoView({behavior:'smooth', block:'start'});
+  } catch(err){
+    console.error(err);
+    alert('ফাইল কনভার্ট করতে সমস্যা হয়েছে: ' + err.message);
+  } finally {
+    btn.textContent = original; btn.disabled=false;
+  }
+}
+
+function downloadDocx(){
+  if (!currentZip || !currentDocXml){ alert('আগে ফাইল কনভার্ট করুন।'); return; }
+  document.querySelectorAll('#docxPreview .rn').forEach(span=>{
+    const idx = parseInt(span.dataset.ref,10);
+    const wtNode = previewRefs[idx];
+    if (wtNode) wtNode.textContent = span.textContent;
+  });
+  currentZip.file(currentMainPath, serializeXml(currentDocXml));
+  currentZip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}}).then(blob=>{
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download=currentOutFileName;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  });
+}
+
+/* ================= UI wiring ================= */
+let direction = 'u2b';
+const pillLeft=document.getElementById('pillLeft'), pillLeftSub=document.getElementById('pillLeftSub');
+const pillRight=document.getElementById('pillRight'), pillRightSub=document.getElementById('pillRightSub');
+const srcLabel=document.getElementById('srcLabel'), resLabel=document.getElementById('resLabel');
+const resFontBadge=document.getElementById('resFontBadge');
+const previewRes=document.getElementById('previewRes');
+const fontNote=document.getElementById('fontNote');
+
+function updateDirectionUI(){
+  if (direction==='u2b'){
+    pillLeft.textContent='SolaimanLipi'; pillLeftSub.textContent='Unicode';
+    pillRight.textContent='SutonnyMJ'; pillRightSub.textContent='Bijoy ANSI';
+    srcLabel.textContent='উৎস লেখা (ইউনিকোড)'; resLabel.textContent='ফলাফল (বিজয়)';
+    resFontBadge.textContent='SutonnyMJ';
+    previewRes.style.fontFamily = "'SutonnyMJ','Noto Sans Bengali',sans-serif";
+    fontNote.textContent = 'SutonnyMJ প্রিভিউ সঠিকভাবে দেখতে আপনার কম্পিউটারে SutonnyMJ ফন্ট ইনস্টল থাকতে হবে। ফন্ট না থাকলে ইংরেজি অক্ষরের মতো দেখাবে — Word-এ পেস্ট করে SutonnyMJ ফন্ট বেছে নিলে ঠিকঠাক বাংলা দেখাবে।';
+  } else {
+    pillLeft.textContent='SutonnyMJ'; pillLeftSub.textContent='Bijoy ANSI';
+    pillRight.textContent='SolaimanLipi'; pillRightSub.textContent='Unicode';
+    srcLabel.textContent='উৎস লেখা (বিজয় ANSI)'; resLabel.textContent='ফলাফল (ইউনিকোড)';
+    resFontBadge.textContent='SolaimanLipi';
+    previewRes.style.fontFamily = "'SolaimanLipi', serif";
+    fontNote.textContent = 'ফলাফল ইউনিকোড হওয়ায় SolaimanLipi ফন্টে সঠিকভাবে প্রিভিউ দেখানো হচ্ছে।';
+  }
+}
+document.getElementById('swapBtn').addEventListener('click', ()=>{
+  direction = direction==='u2b' ? 'b2u' : 'u2b';
+  updateDirectionUI();
+  const s=document.getElementById('srcText'), r=document.getElementById('resText');
+  const tmp=s.value; s.value=r.value; r.value=tmp;
+  document.getElementById('docxPreviewWrap').style.display='none';
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.getElementById('pasteTab').style.display = tab==='paste' ? 'block':'none';
+    document.getElementById('uploadTab').style.display = tab==='upload' ? 'block':'none';
+    document.getElementById('docxPreviewWrap').style.display='none';
+  });
+});
+
+function convertText(str){ return direction==='u2b' ? unicodeToBijoy(str) : bijoyToUnicode(str); }
+
+function runConvert(){
+  const uploadActive = document.getElementById('uploadTab').style.display !== 'none';
+  if (uploadActive) { convertDocxFile(); return; }
+  const src = document.getElementById('srcText').value;
+  const out = convertText(src);
+  document.getElementById('resText').value = out;
+  document.getElementById('previewSrc').textContent = src;
+  document.getElementById('previewRes').textContent = out;
+}
+document.getElementById('convertBtn').addEventListener('click', runConvert);
+document.getElementById('downloadDocxBtn').addEventListener('click', downloadDocx);
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  document.getElementById('srcText').value='';
+  document.getElementById('resText').value='';
+  document.getElementById('previewSrc').textContent='';
+  document.getElementById('previewRes').textContent='';
+  document.getElementById('fileNameShow').textContent='';
+  document.getElementById('fileInput').value='';
+  document.getElementById('docxPreviewWrap').style.display='none';
+  document.getElementById('docxPreview').innerHTML='';
+  window._uploadedFile = null;
+  currentZip=null; currentDocXml=null;
+});
+
+function copyFrom(id){
+  const el=document.getElementById(id);
+  el.select(); el.setSelectionRange(0,999999);
+  navigator.clipboard.writeText(el.value).catch(()=>document.execCommand('copy'));
+}
+document.getElementById('copyBtn').addEventListener('click', ()=>copyFrom('resText'));
+document.getElementById('previewToggleBtn').addEventListener('click', ()=>{
+  document.getElementById('previewArea').classList.toggle('show');
+});
+document.getElementById('srcText').addEventListener('input', (e)=>{ document.getElementById('previewSrc').textContent = e.target.value; });
+document.getElementById('resText').addEventListener('input', (e)=>{ document.getElementById('previewRes').textContent = e.target.value; });
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+dropzone.addEventListener('click', ()=>fileInput.click());
+dropzone.addEventListener('dragover', e=>{e.preventDefault(); dropzone.classList.add('drag');});
+dropzone.addEventListener('dragleave', ()=>dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e=>{ e.preventDefault(); dropzone.classList.remove('drag'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', e=>{ if (e.target.files.length) handleFile(e.target.files[0]); });
+
+function handleFile(file){
+  if (!file.name.toLowerCase().endsWith('.docx')) { alert('শুধুমাত্র .docx ফাইল সাপোর্ট করে।'); return; }
+  window._uploadedFile = file;
+  document.getElementById('fileNameShow').textContent = '✓ ' + file.name + ' — এখন "কনভার্ট করুন" চাপুন';
+  document.getElementById('docxPreviewWrap').style.display='none';
+}
+
+updateDirectionUI();
+</script>
+</body>
+</html>
