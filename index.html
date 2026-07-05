@@ -10,69 +10,125 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
-    --bg:#efe9d8; --panel:#f7f3e7; --ink:#2c2a24; --muted:#7a7462;
-    --accent:#5c5232; --accent-2:#8a7b4a; --line:#d9d0b6; --danger:#b3492f; --ok:#3f6b4a;
+    --bg:#ffffff; --panel:#ffffff; --surface:#f6f7fb; --ink:#16161f; --muted:#6b7280;
+    --line:#e7e9f2; --danger:#e5484d; --ok:#12b76a;
+    --grad-a:#5b4fe0; --grad-b:#00c2a8;
+    --grad: linear-gradient(135deg, var(--grad-a), var(--grad-b));
+    --grad-soft: linear-gradient(135deg, rgba(91,79,224,.10), rgba(0,194,168,.10));
+    --shadow: 0 8px 28px rgba(23,23,45,.08);
+    --shadow-sm: 0 2px 10px rgba(23,23,45,.06);
   }
   *{box-sizing:border-box;}
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Noto Sans Bengali','Segoe UI',sans-serif; padding:28px 16px 60px;}
-  .wrap{max-width:1080px; margin:0 auto;}
-  header{text-align:center; margin-bottom:20px;}
-  header h1{font-family:'Noto Serif Bengali',serif; font-size:1.7rem; margin:0 0 4px; color:var(--accent);}
-  header p{margin:0; color:var(--muted); font-size:.92rem;}
+  body{
+    margin:0; background:#ffffff; color:var(--ink);
+    font-family:'Noto Sans Bengali','Segoe UI',sans-serif;
+    padding:36px 16px 70px; position:relative; overflow-x:hidden;
+  }
+  body::before, body::after{
+    content:''; position:fixed; width:480px; height:480px; border-radius:50%;
+    filter:blur(90px); z-index:-1; opacity:.35; pointer-events:none;
+  }
+  body::before{ top:-220px; left:-160px; background:radial-gradient(circle, var(--grad-a), transparent 70%); }
+  body::after{ bottom:-220px; right:-160px; background:radial-gradient(circle, var(--grad-b), transparent 70%); }
 
-  .tabs{display:flex; gap:8px; margin-bottom:16px; justify-content:center;}
-  .tab-btn{flex:0 1 320px; padding:12px 14px; border:1px solid var(--line); background:var(--panel); border-radius:10px 10px 0 0; cursor:pointer; font-size:.95rem; color:var(--muted); text-align:center; transition:.15s;}
-  .tab-btn.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .wrap{max-width:1080px; margin:0 auto; position:relative;}
+  header{text-align:center; margin-bottom:28px;}
+  header h1{
+    font-family:'Noto Serif Bengali',serif; font-size:2.1rem; font-weight:600; margin:0 0 8px;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:.2px;
+  }
+  header p{margin:0; color:var(--muted); font-size:.95rem;}
 
-  .card{background:var(--panel); border:1px solid var(--line); border-radius:0 10px 10px 10px; padding:20px; margin-bottom:18px;}
+  .tabs{display:flex; gap:10px; margin-bottom:0; justify-content:center; position:relative; z-index:1;}
+  .tab-btn{
+    flex:0 1 320px; padding:13px 14px; border:1px solid var(--line); border-bottom:none;
+    background:var(--surface); border-radius:14px 14px 0 0; cursor:pointer;
+    font-size:.95rem; color:var(--muted); text-align:center; transition:.2s; font-weight:500;
+  }
+  .tab-btn.active{background:#fff; color:var(--ink); box-shadow:var(--shadow-sm); position:relative;}
+  .tab-btn.active::after{
+    content:''; position:absolute; left:14px; right:14px; bottom:-1px; height:3px;
+    background:var(--grad); border-radius:3px;
+  }
 
-  .direction-bar{display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:18px;}
-  .font-pill{padding:10px 18px; border-radius:999px; background:#e7e0c8; border:1px solid var(--line); text-align:center; min-width:170px;}
-  .font-pill b{display:block; font-size:.95rem; color:var(--ink);}
-  .font-pill span{font-size:.75rem; color:var(--muted);}
-  .swap-btn{width:42px; height:42px; border-radius:50%; border:1px solid var(--accent); background:#fff; color:var(--accent); font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s;}
-  .swap-btn:hover{background:var(--accent); color:#fff;}
+  .card{
+    background:#fff; border:1px solid var(--line); border-radius:0 20px 20px 20px;
+    padding:26px; margin-bottom:22px; box-shadow:var(--shadow); position:relative; z-index:0;
+  }
 
-  .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .direction-bar{display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:22px;}
+  .font-pill{
+    padding:12px 22px; border-radius:999px; background:var(--surface); border:1px solid var(--line);
+    text-align:center; min-width:170px; transition:.2s;
+  }
+  .font-pill b{display:block; font-size:.98rem; color:var(--ink); font-weight:600;}
+  .font-pill span{font-size:.74rem; color:var(--muted);}
+  .font-pill.solaimanlipi{ background:rgb(0,71,171); background-image:linear-gradient(159deg, rgba(0,71,171,1) 0%, rgba(28,169,201,1) 100%); border-color:transparent; box-shadow:0 8px 20px rgba(0,71,171,.28); }
+  .font-pill.solaimanlipi b, .font-pill.solaimanlipi span{ color:#fff; }
+  .font-pill.sutonnymj{ background-color:#e55451; background-image:linear-gradient(147deg, #e55451 0%, #cd1c18 74%); border-color:transparent; box-shadow:0 8px 20px rgba(205,28,24,.28); }
+  .font-pill.sutonnymj b, .font-pill.sutonnymj span{ color:#fff; }
+  .swap-btn{
+    width:46px; height:46px; border-radius:50%; border:none; background:var(--grad); color:#fff;
+    font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:.25s; box-shadow:0 6px 16px rgba(91,79,224,.35); flex-shrink:0;
+  }
+  .swap-btn:hover{transform:rotate(180deg) scale(1.06);}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
   @media (max-width:760px){.grid{grid-template-columns:1fr;}}
 
-  .col label{display:flex; justify-content:space-between; align-items:center; font-size:.85rem; color:var(--muted); margin-bottom:6px;}
-  .col label .copy-btn{border:none; background:none; color:var(--accent); cursor:pointer; font-size:.8rem; text-decoration:underline;}
-  textarea{width:100%; min-height:220px; padding:14px; border:1px solid var(--line); border-radius:8px; font-size:1.15rem; line-height:1.9; resize:vertical; background:#fff; color:var(--ink);}
-  textarea[readonly]{background:#faf8f0;}
+  .col label{display:flex; justify-content:space-between; align-items:center; font-size:.85rem; color:var(--muted); margin-bottom:8px; font-weight:500;}
+  .col label .copy-btn{border:none; background:none; color:var(--grad-a); cursor:pointer; font-size:.8rem; font-weight:600;}
+  textarea{
+    width:100%; min-height:220px; padding:16px; border:1.5px solid var(--line); border-radius:14px;
+    font-size:1.15rem; line-height:1.9; resize:vertical; background:var(--surface); color:var(--ink);
+    transition:.2s;
+  }
+  textarea:focus{outline:none; border-color:var(--grad-a); background:#fff; box-shadow:0 0 0 4px rgba(91,79,224,.10);}
+  textarea[readonly]{background:var(--surface);}
 
-  .dropzone{border:2px dashed var(--line); border-radius:10px; padding:40px 20px; text-align:center; background:#fbf9f1; cursor:pointer; color:var(--muted);}
-  .dropzone.drag{border-color:var(--accent); background:#f0ead2;}
+  .dropzone{
+    border:2px dashed #c9cdf0; border-radius:16px; padding:44px 20px; text-align:center;
+    background:var(--grad-soft); cursor:pointer; color:var(--muted); transition:.2s;
+  }
+  .dropzone.drag{border-color:var(--grad-a); background:rgba(91,79,224,.08);}
   .dropzone input{display:none;}
-  .file-name{margin-top:10px; font-size:.85rem; color:var(--ok);}
+  .file-name{margin-top:10px; font-size:.85rem; color:var(--ok); font-weight:600;}
 
-  .actions{display:flex; gap:10px; justify-content:center; margin-top:18px; flex-wrap:wrap;}
-  button.primary{background:var(--accent); color:#fff; border:none; padding:12px 28px; border-radius:8px; font-size:1rem; cursor:pointer;}
-  button.primary:hover{background:#453e25;}
-  button.primary:disabled{opacity:.6; cursor:not-allowed;}
-  button.secondary{background:#fff; color:var(--ink); border:1px solid var(--line); padding:12px 22px; border-radius:8px; cursor:pointer;}
-  button.secondary:hover{border-color:var(--accent);}
+  .actions{display:flex; gap:12px; justify-content:center; margin-top:22px; flex-wrap:wrap;}
+  button.primary{
+    background:var(--grad); color:#fff; border:none; padding:13px 30px; border-radius:12px;
+    font-size:1rem; font-weight:600; cursor:pointer; box-shadow:0 8px 20px rgba(91,79,224,.28); transition:.2s;
+  }
+  button.primary:hover{transform:translateY(-2px); box-shadow:0 12px 24px rgba(91,79,224,.36);}
+  button.primary:disabled{opacity:.55; cursor:not-allowed; transform:none;}
+  button.secondary{
+    background:#fff; color:var(--ink); border:1.5px solid var(--line); padding:13px 24px; border-radius:12px;
+    cursor:pointer; font-weight:500; transition:.2s;
+  }
+  button.secondary:hover{border-color:var(--grad-a); color:var(--grad-a);}
 
-  .preview-toggle{text-align:center; margin-top:6px;}
-  .preview-toggle button{background:none; border:none; color:var(--accent-2); cursor:pointer; font-size:.85rem; text-decoration:underline;}
-  .preview{margin-top:14px; display:none;}
+  .preview-toggle{text-align:center; margin-top:8px;}
+  .preview-toggle button{background:none; border:none; color:var(--grad-a); cursor:pointer; font-size:.85rem; font-weight:600;}
+  .preview{margin-top:16px; display:none;}
   .preview.show{display:block;}
-  .preview-box{border:1px solid var(--line); border-radius:8px; padding:16px; background:#fff; font-size:1.3rem; line-height:2; min-height:80px; white-space:pre-wrap; word-break:break-word;}
+  .preview-box{border:1.5px solid var(--line); border-radius:14px; padding:18px; background:#fff; font-size:1.3rem; line-height:2; min-height:80px; white-space:pre-wrap; word-break:break-word;}
   .preview-box.src{font-family:'SolaimanLipi', serif;}
-  .preview-note{font-size:.78rem; color:var(--muted); margin-top:6px;}
-  .badge{display:inline-block; font-size:.72rem; padding:2px 8px; border-radius:999px; background:#e7e0c8; color:var(--accent); margin-left:6px;}
+  .preview-note{font-size:.78rem; color:var(--muted); margin-top:8px;}
+  .badge{display:inline-block; font-size:.72rem; padding:3px 10px; border-radius:999px; background:var(--grad-soft); color:var(--grad-a); font-weight:600; margin-left:6px;}
 
   /* docx preview */
-  #docxPreviewWrap{margin-top:22px; display:none;}
-  .preview-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;}
-  .preview-toolbar h3{margin:0; font-size:1rem; color:var(--accent); font-family:'Noto Serif Bengali',serif;}
-  .docx-page{background:#fff; border:1px solid var(--line); border-radius:8px; padding:28px 30px; min-height:200px; max-height:640px; overflow:auto; font-size:1.15rem; line-height:1.9;}
+  #docxPreviewWrap{margin-top:26px; display:none;}
+  .preview-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;}
+  .preview-toolbar h3{margin:0; font-size:1.05rem; font-weight:600; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; font-family:'Noto Serif Bengali',serif;}
+  .docx-page{background:#fff; border:1.5px solid var(--line); border-radius:16px; padding:30px 32px; min-height:200px; max-height:640px; overflow:auto; font-size:1.15rem; line-height:1.9; box-shadow:var(--shadow-sm);}
   .docx-page p{margin:0 0 8px;}
   .docx-page table.doc-table{border-collapse:collapse; width:100%; margin-bottom:10px;}
-  .docx-page table.doc-table td{border:1px solid #ccc; padding:6px 8px; vertical-align:top;}
-  .docx-page .eq{display:inline-block; background:#f0ead2; border:1px solid var(--line); border-radius:4px; padding:0 6px; font-family:'Cambria Math','Times New Roman',serif; font-style:italic; margin:0 2px;}
-  .docx-page .rn{outline:none;}
-  .docx-page .rn:focus{background:#fff6d6;}
+  .docx-page table.doc-table td{border:1px solid var(--line); padding:6px 8px; vertical-align:top;}
+  .docx-page .eq{display:inline-block; background:var(--grad-soft); border:1px solid var(--line); border-radius:6px; padding:0 6px; font-family:'Cambria Math','Times New Roman',serif; font-style:italic; margin:0 2px;}
+  .docx-page .rn{outline:none; border-radius:3px;}
+  .docx-page .rn:focus{background:rgba(0,194,168,.14);}
 </style>
 </head>
 <body>
@@ -269,7 +325,7 @@ function bijoyToUnicode(text){
   s = s.split(' ঃ').join(' :');
   s = s.split('অা').join('আ');
   s = s.split('্‌্‌').join('্‌');
-  return s;
+  return s.normalize('NFC');
 }
 
 function moveReph(str){
@@ -336,6 +392,46 @@ function setFont(doc, runEl, fontName){
   rFonts.setAttribute('w:cs', fontName);
 }
 
+function rprSignature(runEl){
+  const rPr = directChild(runEl,'w:rPr');
+  if (!rPr) return 'none';
+  const rFonts = directChild(rPr,'w:rFonts');
+  const f = rFonts ? [rFonts.getAttribute('w:ascii')||'',rFonts.getAttribute('w:hAnsi')||'',rFonts.getAttribute('w:cs')||''].join('|') : '';
+  const flag = (tag)=> directChild(rPr,tag) ? '1' : '0';
+  const valOf = (tag)=>{ const el = directChild(rPr,tag); return el ? (el.getAttribute('w:val')||'1') : ''; };
+  // Only compare properties that affect visual rendering; ignore w:lang, rsid,
+  // eastAsiaTheme etc. since Word often varies those across an otherwise
+  // identical run when it auto-splits a single word mid-conjunct.
+  return [f, flag('w:b'), flag('w:i'), flag('w:iCs'), valOf('w:u'), valOf('w:sz'), valOf('w:color'), valOf('w:vertAlign')].join('~');
+}
+function isSimpleTextRun(runEl){
+  const kids = Array.from(runEl.children).filter(c=>c.tagName!=='w:rPr');
+  return kids.length===1 && kids[0].tagName==='w:t';
+}
+function mergeSplitRuns(xmlDoc){
+  // Word (esp. after spell-check/grammar passes) often splits a single word or
+  // even a single conjunct across several consecutive runs that share identical
+  // formatting. Converting them independently corrupts kars/conjuncts, so merge
+  // adjacent same-format simple text runs back together before conversion.
+  const paras = Array.from(xmlDoc.getElementsByTagName('w:p'));
+  for (const p of paras){
+    let kids = Array.from(p.children);
+    for (let idx=0; idx<kids.length-1; idx++){
+      const cur = kids[idx], next = kids[idx+1];
+      if (!cur || !next || cur.tagName!=='w:r' || next.tagName!=='w:r') continue;
+      if (!isSimpleTextRun(cur) || !isSimpleTextRun(next)) continue;
+      if (rprSignature(cur) !== rprSignature(next)) continue;
+      const curWt = directChild(cur,'w:t');
+      const nextWt = directChild(next,'w:t');
+      curWt.textContent = curWt.textContent + nextWt.textContent;
+      curWt.setAttribute('xml:space','preserve');
+      p.removeChild(next);
+      kids.splice(idx+1,1);
+      idx--;
+    }
+  }
+}
+
 function processRunB2U(doc, runEl){
   const f = getFontNames(runEl);
   if (!isSutonnyFont(f)) return;
@@ -382,6 +478,7 @@ function processRunU2B(doc, runEl){
 }
 
 function processPart(xmlDoc, direction){
+  mergeSplitRuns(xmlDoc);
   const runs = Array.from(xmlDoc.getElementsByTagName('w:r'));
   for (const r of runs){ direction==='u2b' ? processRunU2B(xmlDoc, r) : processRunB2U(xmlDoc, r); }
 }
@@ -537,6 +634,7 @@ function downloadDocx(){
 let direction = 'u2b';
 const pillLeft=document.getElementById('pillLeft'), pillLeftSub=document.getElementById('pillLeftSub');
 const pillRight=document.getElementById('pillRight'), pillRightSub=document.getElementById('pillRightSub');
+const pillLeftBox = pillLeft.parentElement, pillRightBox = pillRight.parentElement;
 const srcLabel=document.getElementById('srcLabel'), resLabel=document.getElementById('resLabel');
 const resFontBadge=document.getElementById('resFontBadge');
 const previewRes=document.getElementById('previewRes');
@@ -546,6 +644,7 @@ function updateDirectionUI(){
   if (direction==='u2b'){
     pillLeft.textContent='SolaimanLipi'; pillLeftSub.textContent='Unicode';
     pillRight.textContent='SutonnyMJ'; pillRightSub.textContent='Bijoy ANSI';
+    pillLeftBox.className='font-pill solaimanlipi'; pillRightBox.className='font-pill sutonnymj';
     srcLabel.textContent='উৎস লেখা (ইউনিকোড)'; resLabel.textContent='ফলাফল (বিজয়)';
     resFontBadge.textContent='SutonnyMJ';
     previewRes.style.fontFamily = "'SutonnyMJ','Noto Sans Bengali',sans-serif";
@@ -553,6 +652,7 @@ function updateDirectionUI(){
   } else {
     pillLeft.textContent='SutonnyMJ'; pillLeftSub.textContent='Bijoy ANSI';
     pillRight.textContent='SolaimanLipi'; pillRightSub.textContent='Unicode';
+    pillLeftBox.className='font-pill sutonnymj'; pillRightBox.className='font-pill solaimanlipi';
     srcLabel.textContent='উৎস লেখা (বিজয় ANSI)'; resLabel.textContent='ফলাফল (ইউনিকোড)';
     resFontBadge.textContent='SolaimanLipi';
     previewRes.style.fontFamily = "'SolaimanLipi', serif";
