@@ -165,12 +165,6 @@
   .progress-label{font-size:.78rem; color:var(--muted); margin-top:6px; text-align:center;}
 
   .legacy-box{display:none; margin-top:16px; padding:14px 16px; border:1.5px dashed var(--line); border-radius:14px; background:var(--surface);}
-  .gdocs-row{display:flex; gap:8px; flex-wrap:wrap;}
-  .gdocs-row input[type=text]{
-    flex:1 1 280px; padding:11px 14px; border:1.5px solid var(--line); border-radius:10px; background:var(--panel);
-    color:var(--ink); font-size:.9rem;
-  }
-  .gdocs-row input[type=text]:focus{outline:none; border-color:var(--grad-a);}
 
   #docxPreviewWrap{margin-top:26px; display:none;}
   .preview-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;}
@@ -205,8 +199,6 @@
     .preview-toolbar{flex-direction:column; align-items:stretch;}
     .toolbar-actions{justify-content:space-between;}
     .docx-page{padding:18px 14px;}
-    .gdocs-row{flex-direction:column;}
-    .gdocs-row button{width:100%;}
   }
 </style>
 </head>
@@ -269,13 +261,6 @@
         <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
         <div class="progress-label" id="progressLabel"></div>
       </div>
-      <div class="legacy-box" id="legacyBox">
-        <div class="gdocs-row">
-          <input type="text" id="gdocsInput" placeholder="Google Docs শেয়ার লিংক পেস্ট করুন (Anyone with link can view)">
-          <button class="secondary" id="gdocsFetchBtn">লিংক থেকে আনুন</button>
-        </div>
-        <div class="preview-note">⚠️ পুরনো <b>.doc</b> ফরম্যাট সরাসরি সাপোর্ট করা যায় না। Word/Google Docs-এ ফাইলটি খুলে <b>".docx"</b> হিসেবে Save As / Download করে তারপর আপলোড করুন।</div>
-      </div>
       <div class="preview-note" style="text-align:center; margin-top:12px;">
         শুধু বাংলা লেখা কনভার্ট হবে — ইংরেজি লেখা, সংখ্যা, সমীকরণ (Equation) এবং ছবি অপরিবর্তিত থাকবে।
       </div>
@@ -337,6 +322,16 @@ const BIJOY_MAP = {
 const BIJOY_KEYS = Object.keys(BIJOY_MAP).sort((a,b)=>b.length-a.length);
 const UNICODE_MAP = {};
 for (const k of Object.keys(BIJOY_MAP)) { const v = BIJOY_MAP[k]; if (!(v in UNICODE_MAP)) UNICODE_MAP[v] = k; }
+// MAIN_CHAR_MAP is the authoritative, field-tested Unicode->Bijoy conjunct table
+// (covers many compound conjuncts like গ্ন/গ্ম/গ্ল/ক্ল/ব্ব/ল্ল/শ্ন that a naive
+// reverse-map misses, which previously fell back to an ugly '&' composition).
+const MAIN_CHAR_MAP = {"।":"|","‘":"Ô","’":"Õ","“":"Ò","”":"Ó","্র্য":"ª¨","ম্প্র":"¤cÖ","র‌্য":"i¨","ক্ষ্ম":"²","ক্ক":"°","ক্ট":"±","ক্ত":"³","ক্ব":"K¡","স্ক্র":"¯Œ","ক্র":"µ","ক্ল":"K¬","ক্ষ":"¶","ক্স":"·","গু":"¸","গ্ধ":"»","গ্ন":"Mœ","গ্ম":"M¥","গ্ল":"M­","গ্রু":"Mªy","ঙ্ক":"¼","ঙ্ক্ষ":"•¶","ঙ্খ":"•L","ঙ্গ":"½","ঙ্ঘ":"•N","চ্ছ্ব":"”Q¡","চ্চ":"”P","চ্ছ":"”Q","চ্ঞ":"”T","জ্জ্ব":"¾¡","জ্জ":"¾","জ্ঝ":"À","জ্ঞ":"Á","জ্ব":"R¡","ঞ্চ":"Â","ঞ্ছ":"Ã","ঞ্জ":"Ä","ঞ্ঝ":"Å","ট্ট":"Æ","ট্ব":"U¡","ট্ম":"U¥","ড্ড":"Ç","ণ্ট":"È","ণ্ঠ":"É","ন্স":"Ý","ণ্ড":"Ê","ন্তু":"š‘","ণ্ব":"Y^","ত্ত্ব":"Ë¡","ত্ত":"Ë","ত্থ":"Ì","ত্ন":"Zœ","ত্ম":"Z¥","ন্ত্ব":"š—¡","ত্ব":"Z¡","থ্ব":"_¡","দ্গ":"˜M","দ্ঘ":"˜N","দ্দ":"Ï","দ্ধ":"×","দ্ব":"Ø","দ্ভ":"™¢","দ্ম":"Ù","দ্রু":"`ª“","ধ্ব":"aŸ","ধ্ম":"a¥","ন্ট":"›U","ন্ঠ":"Ú","ন্ড":"Û","ন্ত্র":"š¿","ন্ত":"š—","স্ত্র":"¯¿","ত্র":"Î","ন্থ":"š’","ন্দ":"›`","ন্দ্ব":"›Ø","ন্ধ":"Ü","ন্ন":"bœ","ন্ব":"š^","ন্ম":"b¥","প্ট":"Þ","প্ত":"ß","প্ন":"cœ","প্প":"à","প্ল":"c­","প্স":"á","ফ্ল":"d¬","ব্জ":"â","ব্দ":"ã","ব্ধ":"ä","ব্ব":"eŸ","ব্ল":"e­","ভ্র":"å","ম্ন":"gœ","ম্প":"¤ú","ম্ফ":"ç","ম্ব":"¤^","ম্ভ":"¤¢","ম্ভ্র":"¤£","ম্ম":"¤§","ম্ল":"¤­","্র":"«","রু":"i“","রূ":"iƒ","ল্ক":"é","ল্গ":"ê","ল্ট":"ë","ল্ড":"ì","ল্প":"í","ল্ফ":"î","ল্ব":"j¦","ল্ম":"j¥","ল্ল":"j­","শু":"ï","শ্চ":"ð","শ্ন":"kœ","শ্ব":"k¦","শ্ম":"k¥","শ্ল":"k­","ষ্ক":"®‹","ষ্ক্র":"®Œ","ষ্ট":"ó","ষ্ঠ":"ô","ষ্ণ":"ò","ষ্প":"®ú","ষ্ফ":"õ","ষ্ম":"®§","স্ক":"¯‹","স্ট":"÷","স্খ":"ö","স্ত":"¯—","স্তু":"¯‘","স্থ":"¯’","স্ন":"mœ","স্প":"¯ú","স্ফ":"ù","স্ব":"¯^","স্ম":"¯§","স্ল":"¯­","হু":"û","হ্ণ":"nè","হ্ব":"nŸ","হ্ন":"ý","হ্ম":"þ","হ্ল":"n¬","হৃ":"ü","র্":"©","্য":"¨","্":"&","আ":"Av","অ":"A","ই":"B","ঈ":"C","উ":"D","ঊ":"E","ঋ":"F","এ":"G","ঐ":"H","ও":"I","ঔ":"J","ক":"K","খ":"L","গ":"M","ঘ":"N","ঙ":"O","চ":"P","ছ":"Q","জ":"R","ঝ":"S","ঞ":"T","ট":"U","ঠ":"V","ড":"W","ঢ":"X","ণ":"Y","ত":"Z","থ":"_","দ":"`","ধ":"a","ন":"b","প":"c","ফ":"d","ব":"e","ভ":"f","ম":"g","য":"h","র":"i","ল":"j","শ":"k","ষ":"l","স":"m","হ":"n","ড়":"o","ঢ়":"p","য়":"q","ৎ":"r","০":"0","১":"1","২":"2","৩":"3","৪":"4","৫":"5","৬":"6","৭":"7","৮":"8","৯":"9","া":"v","ি":"w","ী":"x","ু":"y","ূ":"~","ৃ":"…","ে":"‡","ৈ":"‰","ৗ":"Š","ং":"s","ঃ":"t","ঁ":"u"};
+// 'ক্ষ্ম' and '্র্য' are excluded below: the reference map reuses a Bijoy glyph slot
+// that our decode table assigns to a different (more common) conjunct, which breaks
+// round-tripping for real words like স্বাতন্ত্র্য, সূক্ষ্ম, যক্ষ্মা, লক্ষ্মণ.
+// Skipping these two lets the encoder fall back to correct compositional encoding.
+const MAIN_CHAR_SKIP = new Set(['ক্ষ্ম','্র্য']);
+for (const k of Object.keys(MAIN_CHAR_MAP)) { if (MAIN_CHAR_SKIP.has(k)) continue; UNICODE_MAP[k] = MAIN_CHAR_MAP[k]; }
 const UNICODE_KEYS = Object.keys(UNICODE_MAP).sort((a,b)=>b.length-a.length);
 
 function mapChars(str, map, keysDesc, fallback) {
@@ -443,7 +438,7 @@ function bijoyToUnicode(text){
 function moveReph(str){
   let a = Array.from(str); let out = []; let i = 0;
   while (i < a.length) {
-    if (a[i]==='র' && a[i+1]==='্' && isBanjon(a[i+2])) {
+    if (a[i]==='র' && a[i+1]==='্' && isBanjon(a[i+2]) && a[i-1]!=='্') {
       let j = i+2;
       while (j+2 < a.length && a[j+1]==='্' && isBanjon(a[j+2]) && a[j]!=='র') j += 2;
       let end = j+1; if (end<a.length && isKar(a[end])) end++;
@@ -538,13 +533,22 @@ function mergeSplitRuns(xmlDoc){
   }
 }
 
+const ROMAN_NUMERAL_LIST_RE = /^\s*(i{1,3}|iv|v)\s*(,\s*(i{1,3}|iv|v)\s*)*$/i;
 function processRunB2U(doc, runEl, convertedSet){
   const f = getFontNames(runEl);
   if (!isSutonnyFont(f)) return;
   const wts = Array.from(runEl.children).filter(c=>c.tagName==='w:t');
   if (!wts.length) return;
   let changed=false;
-  for (const wt of wts){ const txt = wt.textContent; if (!txt) continue; wt.textContent = bijoyToUnicode(txt); changed=true; convertedSet.add(wt); }
+  for (const wt of wts){
+    const txt = wt.textContent; if (!txt) continue;
+    // Guard: plain roman-numeral option labels ("i, ii", "ii, iii", ...) are
+    // sometimes mistakenly left tagged with the SutonnyMJ font in real
+    // documents even though they're genuine English text; decoding them as
+    // Bijoy corrupts them (e.g. "i, ii" -> "র, রর"). Leave these untouched.
+    if (ROMAN_NUMERAL_LIST_RE.test(txt)) continue;
+    wt.textContent = bijoyToUnicode(txt); changed=true; convertedSet.add(wt);
+  }
   if (changed) setFont(doc, runEl, 'SolaimanLipi');
 }
 
@@ -716,7 +720,6 @@ const srcLabel=document.getElementById('srcLabel'), resLabel=document.getElement
 const resFontBadge=document.getElementById('resFontBadge');
 const previewRes=document.getElementById('previewRes');
 const fontNote=document.getElementById('fontNote');
-const legacyBox=document.getElementById('legacyBox');
 const fileInputEl=document.getElementById('fileInput');
 
 function updateDirectionUI(){
@@ -728,8 +731,6 @@ function updateDirectionUI(){
     resFontBadge.textContent='SutonnyMJ';
     previewRes.style.fontFamily = "'SutonnyMJ','Noto Sans Bengali',sans-serif";
     fontNote.textContent = 'SutonnyMJ প্রিভিউ সঠিকভাবে দেখতে আপনার কম্পিউটারে SutonnyMJ ফন্ট ইনস্টল থাকতে হবে। ফন্ট না থাকলে ইংরেজি অক্ষরের মতো দেখাবে — Word-এ পেস্ট করে SutonnyMJ ফন্ট বেছে নিলে ঠিকঠাক বাংলা দেখাবে।';
-    legacyBox.style.display='none';
-    fileInputEl.accept='.docx';
   } else {
     pillLeft.textContent='SutonnyMJ'; pillLeftSub.textContent='Bijoy ANSI';
     pillRight.textContent='SolaimanLipi'; pillRightSub.textContent='Unicode';
@@ -738,8 +739,6 @@ function updateDirectionUI(){
     resFontBadge.textContent='SolaimanLipi';
     previewRes.style.fontFamily = "'SolaimanLipi', serif";
     fontNote.textContent = 'ফলাফল ইউনিকোড হওয়ায় SolaimanLipi ফন্টে সঠিকভাবে প্রিভিউ দেখানো হচ্ছে।';
-    legacyBox.style.display='block';
-    fileInputEl.accept='.docx,.doc';
   }
 }
 document.getElementById('swapBtn').addEventListener('click', ()=>{
@@ -784,7 +783,6 @@ document.getElementById('clearBtn').addEventListener('click', ()=>{
   document.getElementById('docxPreviewWrap').classList.remove('fs-active');
   document.getElementById('docxPreviewWrap').style.display='none';
   document.getElementById('docxPreview').innerHTML='';
-  document.getElementById('gdocsInput').value='';
   uploadedFiles = []; currentEntry = null;
   renderFileChips();
   showProgress(false);
@@ -984,26 +982,6 @@ document.getElementById('zoomInBtn').addEventListener('click', ()=>setZoom(zoomL
 document.getElementById('zoomOutBtn').addEventListener('click', ()=>setZoom(zoomLevel-0.1));
 document.getElementById('fullscreenBtn').addEventListener('click', ()=>{
   document.getElementById('docxPreviewWrap').classList.toggle('fs-active');
-});
-
-/* ---------- Google Docs link import ---------- */
-document.getElementById('gdocsFetchBtn').addEventListener('click', async ()=>{
-  const url = document.getElementById('gdocsInput').value.trim();
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (!m){ alert('সঠিক Google Docs শেয়ার লিংক পেস্ট করুন (যেমন: https://docs.google.com/document/d/XXXXX/edit)।'); return; }
-  const id = m[1];
-  const btn = document.getElementById('gdocsFetchBtn');
-  const original = btn.textContent; btn.textContent='আনা হচ্ছে...'; btn.disabled=true;
-  try{
-    const resp = await fetch(`https://docs.google.com/document/d/${id}/export?format=docx`);
-    if (!resp.ok) throw new Error('status '+resp.status);
-    const blob = await resp.blob();
-    const file = new File([blob], 'google-doc-'+id+'.docx', {type: blob.type});
-    addFiles([file]);
-    document.getElementById('gdocsInput').value='';
-  }catch(err){
-    alert('Google Docs থেকে সরাসরি আনা যায়নি (শেয়ারিং সেটিংস বা ব্রাউজার সীমাবদ্ধতার কারণে হতে পারে)। বিকল্প হিসেবে: Google Docs-এ ফাইল > Download > Microsoft Word (.docx) করে ডাউনলোড করে এখানে আপলোড করুন।');
-  } finally { btn.textContent=original; btn.disabled=false; }
 });
 
 /* ---------- keyboard shortcuts ---------- */
